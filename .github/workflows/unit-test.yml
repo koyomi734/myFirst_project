@@ -36,4 +36,4 @@ jobs:
       - name: Install packages
         run: npm ci
       - name: Show coverage
-        run: npm test -- --maxWorkers=100% --coverage
+        run: npm test -- --maxWorkers=100% --coverage --detectOpenHandles --forceExit
