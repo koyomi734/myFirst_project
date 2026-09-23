@@ -1,0 +1,39 @@
+# アクション名
+name: Jest Unit Test
+
+# 実行タイミング
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+  push:
+    branches:
+      - main
+      - develop
+
+env:
+  WORKING_DIRECTORY: flower-fortune
+
+jobs:
+  Test:
+    name: Run test codes
+    if: |
+      github.event.pull_request.draft == false
+      && !startsWith(github.head_ref, 'release')
+      && !startsWith(github.head_ref, 'doc')
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Install and cache nodejs
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: ${{ env.WORKING_DIRECTORY }}/package.json
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+      - name: Install packages
+        run: npm ci
+      - name: Show coverage
+        run: npm test -- --maxWorkers=100% --watchAll=false --coverage
